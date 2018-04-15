@@ -112,6 +112,54 @@ class PatientStateMonitor:
     def get_num_of_STROKE(self):
         return self._strokecount
 
+class PatientCostUtilityMonitor:
+
+    def __init__(self, parameters):
+
+        # model parameters for this patient
+        self._param = parameters
+
+        # total cost and utility
+        self._totalDiscountedCost = 0
+        self._totalDiscountedUtility = 0
+
+    def update(self, k, current_state, next_state):
+        """ updates the discounted total cost and health utility
+        :param k: simulation time step
+        :param current_state: current health state
+        :param next_state: next health state
+        """
+
+        # update cost
+        cost = 0.5 * (self._param.get_annual_state_cost(current_state) +
+                      self._param.get_annual_state_cost(next_state)) * self._param.get_delta_t()
+        # update utility
+        utility = 0.5 * (self._param.get_annual_state_utility(current_state) +
+                         self._param.get_annual_state_utility(next_state)) * self._param.get_delta_t()
+
+        # add the cost of treatment
+        # if HIV death will occur
+        if next_state in [P.HealthStats.HIV_DEATH, P.HealthStats.BACKGROUND_DEATH]:
+            cost += 0.5 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
+        else:
+            cost += 1 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
+
+        # update total discounted cost and utility (corrected for the half-cycle effect)
+        self._totalDiscountedCost += \
+            EconCls.pv(cost, self._param.get_adj_discount_rate() / 2, 2*k + 1)
+        self._totalDiscountedUtility += \
+            EconCls.pv(utility, self._param.get_adj_discount_rate() / 2, 2*k + 1)
+
+    def get_total_discounted_cost(self):
+        """ :returns total discounted cost """
+        return self._totalDiscountedCost
+
+    def get_total_discounted_utility(self):
+        """ :returns total discounted utility"""
+        return  self._totalDiscountedUtility
+
+
+
 class Cohort:
     def __init__(self, id, therapy):
         """ create a cohort of patients

@@ -15,6 +15,63 @@ class Therapies(Enum):
     NONE = 0
     ANTICOAG = 1
 
+class _Parameters:
+
+    def __init__(self, therapy):
+
+        # selected therapy
+        self._therapy = therapy
+
+        # simulation time step
+        self._delta_t = Data.DELTA_T
+
+        # calculate the adjusted discount rate
+        self._adjDiscountRate = Data.DISCOUNT*Data.DELTA_T
+
+        # initial health state
+        self._initialHealthState = HealthStats.CD4_200to500
+
+        # annual treatment cost
+        if self._therapy == Therapies.MONO:
+            self._annualTreatmentCost = Data.Zidovudine_COST
+        else:
+            self._annualTreatmentCost = Data.Zidovudine_COST + Data.Lamivudine_COST
+
+        # transition probability matrix of the selected therapy
+        self._prob_matrix = []
+        # treatment relative risk
+        self._treatmentRR = 0
+
+        # annual state costs and utilities
+        self._annualStateCosts = []
+        self._annualStateUtilities = []
+
+    def get_initial_health_state(self):
+        return self._initialHealthState
+
+    def get_delta_t(self):
+        return self._delta_t
+
+    def get_adj_discount_rate(self):
+        return self._adjDiscountRate
+
+    def get_transition_prob(self, state):
+        return self._prob_matrix[state.value]
+
+    def get_annual_state_cost(self, state):
+        if state == HealthStats.HIV_DEATH or state == HealthStats.BACKGROUND_DEATH:
+            return 0
+        else:
+            return self._annualStateCosts[state.value]
+
+    def get_annual_state_utility(self, state):
+        if state == HealthStats.HIV_DEATH or state == HealthStats.BACKGROUND_DEATH:
+            return 0
+        else:
+            return self._annualStateUtilities[state.value]
+
+    def get_annual_treatment_cost(self):
+        return self._annualTreatmentCost
 
 class ParametersFixed():
     def __init__(self, therapy):
