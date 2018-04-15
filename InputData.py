@@ -11,6 +11,23 @@ TRANS_MATRIX = [
     [0.0,   0.0,    0.0,    1.0],   # Dead
     ]
 
+# annual cost of each health state
+ANNUAL_STATE_COST = [
+    0,      #Well
+    5000,   # Stroke
+    200,   # Post-stroke
+    2000    # Anti-coagulation
+    ]
+
+# annual health utility of each health state
+ANNUAL_STATE_UTILITY = [
+    1.0,   # Well
+    0.8865,# Stroke
+    0.9,   # Post-stroke
+    0.0    # Dead
+    ]
+
+
 # anticoagulation relative risk in reducing stroke incidence and stroke death while in “Post-Stroke”
 RR_STROKE = 0.65
 # anticoagulation relative risk in increasing mortality due to bleeding is 1.05.
