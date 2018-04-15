@@ -1,6 +1,6 @@
-import HW9.ParameterClasses as P
-import HW9.MarkovModel as MarkovCls
-import HW9.SupportMarkovModel as SupportMarkov
+import ParameterClasses as P
+import MarkovModel as MarkovCls
+import SupportMarkovModel as SupportMarkov
 import scr.SamplePathClasses as PathCls
 import scr.FigureSupport as Figs
 
