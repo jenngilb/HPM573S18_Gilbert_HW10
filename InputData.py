@@ -4,6 +4,11 @@ ALPHA = 0.05        # significance level for calculating confidence intervals
 DELTA_T = 1         # years (length of time step, how frequently you look at the patient)
 DISCOUNT = 0.03     # annual discount rate
 
+ADD_BACKGROUND_MORT = True  # if background mortality should be added
+DELTA_T = 1/4       # years
+
+PSA_ON = False      # if probabilistic sensitivity analysis is on
+
 # transition matrix
 TRANS_MATRIX = [
     [0.75,  0.15,   0.0,    0.1],   # Well

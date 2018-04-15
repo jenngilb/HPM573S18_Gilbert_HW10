@@ -1,5 +1,5 @@
 import ParameterClasses as P
-import MarkovClasses as MarkovCls
+import MarkovModel as MarkovCls
 import SupportMarkovModel as SupportMarkov
 
 
@@ -7,7 +7,7 @@ import SupportMarkovModel as SupportMarkov
 # create a cohort
 cohort_mono = MarkovCls.Cohort(
     id=0,
-    therapy=P.Therapies.MONO)
+    therapy=P.Therapies.NONE)
 # simulate the cohort
 simOutputs_mono = cohort_mono.simulate()
 
@@ -15,7 +15,7 @@ simOutputs_mono = cohort_mono.simulate()
 # create a cohort
 cohort_combo = MarkovCls.Cohort(
     id=0,
-    therapy=P.Therapies.COMBO)
+    therapy=P.Therapies.ANTICOAG)
 # simulate the cohort
 simOutputs_combo = cohort_combo.simulate()
 
@@ -23,8 +23,8 @@ simOutputs_combo = cohort_combo.simulate()
 SupportMarkov.draw_survival_curves_and_histograms(simOutputs_mono, simOutputs_combo)
 
 # print the estimates for the mean survival time and mean time to AIDS
-SupportMarkov.print_outcomes(simOutputs_mono, "Mono Therapy:")
-SupportMarkov.print_outcomes(simOutputs_combo, "Combination Therapy:")
+SupportMarkov.print_outcomes(simOutputs_mono, "Hmwk q2: No Therapy:")
+SupportMarkov.print_outcomes(simOutputs_combo, "Hmwk q2: Anticoagulation Therapy:")
 
 # print comparative outcomes
 SupportMarkov.print_comparative_outcomes(simOutputs_mono, simOutputs_combo)

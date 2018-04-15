@@ -1,5 +1,9 @@
 import InputData as Settings
 import scr.FormatFunctions as F
+import scr.SamplePathClasses as PathCls
+import scr.FigureSupport as Figs
+import scr.StatisticalClasses as Stat
+import scr.EconEvalClasses as Econ
 
 
 def print_outcomes(simOutput, therapy_name):
