@@ -7,7 +7,7 @@ import scr.FigureSupport as Figs
 # create and cohort
 cohort = MarkovCls.Cohort(
     id=0,
-    therapy=P.Therapies.ANTICOAG)
+    therapy=P.Therapies.NONE)
 
 simOutputs = cohort.simulate()
 
@@ -40,3 +40,4 @@ Figs.graph_histogram(
 
 # print outcomes (means and CIs)
 SupportMarkov.print_outcomes(simOutputs, 'No treatment:')
+

@@ -3,31 +3,32 @@ import MarkovModel as MarkovCls
 import SupportMarkovModel as SupportMarkov
 
 
-# simulating mono therapy
+# simulating no therapy
 # create a cohort
-cohort_mono = MarkovCls.Cohort(
+cohort_none = MarkovCls.Cohort(
     id=0,
     therapy=P.Therapies.NONE)
 # simulate the cohort
-simOutputs_mono = cohort_mono.simulate()
+simOutputs_none = cohort_none.simulate()
 
-# simulating combination therapy
+# simulating anticoagulation therapy
 # create a cohort
-cohort_combo = MarkovCls.Cohort(
+cohort_anticoag = MarkovCls.Cohort(
     id=0,
     therapy=P.Therapies.ANTICOAG)
 # simulate the cohort
-simOutputs_combo = cohort_combo.simulate()
+simOutputs_anticoag = cohort_anticoag.simulate()
 
 # draw survival curves and histograms
-SupportMarkov.draw_survival_curves_and_histograms(simOutputs_mono, simOutputs_combo)
+SupportMarkov.draw_survival_curves_and_histograms(simOutputs_none, simOutputs_anticoag)
 
-# print the estimates for the mean survival time and mean time to AIDS
-SupportMarkov.print_outcomes(simOutputs_mono, "Hmwk q1-q4: No Therapy:")
-SupportMarkov.print_outcomes(simOutputs_combo, "Hmwk q1-q4: Anticoagulation Therapy:")
+# print the estimates for the mean survival time and mean time to Stroke
+SupportMarkov.print_outcomes(simOutputs_none, "No Therapy:")
+SupportMarkov.print_outcomes(simOutputs_anticoag, "Anticoagulation Therapy:")
 
 # print comparative outcomes
-SupportMarkov.print_comparative_outcomes(simOutputs_mono, simOutputs_combo)
+SupportMarkov.print_comparative_outcomes(simOutputs_none, simOutputs_anticoag)
 
 # report the CEA results
-SupportMarkov.report_CEA_CBA(simOutputs_mono, simOutputs_combo)
+SupportMarkov.report_CEA_CBA(simOutputs_none, simOutputs_anticoag)
+

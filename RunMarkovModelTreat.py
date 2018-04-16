@@ -11,6 +11,7 @@ cohort = MarkovCls.Cohort(
 
 simOutputs = cohort.simulate()
 
+
 # graph survival curve
 PathCls.graph_sample_path(
     sample_path=simOutputs.get_survival_curve(),

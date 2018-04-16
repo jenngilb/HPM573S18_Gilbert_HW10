@@ -1,11 +1,12 @@
 import scr.SamplePathClasses as PathCls
 import scr.StatisticalClasses as StatCls
 import scr.RandomVariantGenerators as rndClasses
+import scr.EconEvalClasses as EconCls
 import ParameterClasses as P
 import InputData as Data
 
 # patient class simulates patient, patient monitor follows patient, cohort simulates a cohort,
-#  cohort outcome extracts info from simulation and returns it back
+# cohort outcome extracts info from simulation and returns it back
 
 
 class Patient:  # when you store in self then all the things in that class have access to it
@@ -27,6 +28,7 @@ class Patient:  # when you store in self then all the things in that class have 
 
     def simulate(self, sim_length):
         """ simulate the patient over the specified simulation length """
+
         # random number generator for this patient
         self._rng = rndClasses.RNG(self._id)  # from now on use random number generator from support library
 
@@ -34,12 +36,13 @@ class Patient:  # when you store in self then all the things in that class have 
 
         # while the patient is alive and simulation length is not yet reached
         while self._stateMonitor.get_if_alive() and k*self._delta_t < sim_length:
+
             # find transition probabilities of future state
             trans_prob = self._param.get_transition_prob(self._stateMonitor.get_current_state())
             # create an empirical distribution
             empirical_dist = rndClasses.Empirical(trans_prob)
             # sample from the empirical distribution to get a new state
-            # (return an intger from {0, 1, 2, ...}
+            # (return an intger from {0, 1, 2, ...})
             new_state_index = empirical_dist.sample(self._rng) # pass RNG
 
             # update health state
@@ -56,10 +59,6 @@ class Patient:  # when you store in self then all the things in that class have 
         """ returns the patient's time to the POST_STROKE state """
         return self._stateMonitor.get_num_of_STROKE()
 
-    def get_time_to_stroke(self):
-        """ returns the patient's time to AIDS """
-        return self._stateMonitor.get_time_to_stroke()
-
     def get_total_discounted_cost(self):
         """ :returns total discounted cost """
         return self._stateMonitor.get_total_discounted_cost()
@@ -68,7 +67,6 @@ class Patient:  # when you store in self then all the things in that class have 
         """ :returns total discounted utility"""
         return self._stateMonitor.get_total_discounted_utility()
 
-
 class PatientStateMonitor:
     """ to update patient outcomes (years survived, cost, etc.) throughout the simulation """
     def __init__(self, parameters):
@@ -76,13 +74,13 @@ class PatientStateMonitor:
         :param parameters: patient parameters
         """
         # current health state
-        self._currentState = parameters.get_initial_health_state()
-        self._delta_t = parameters.get_delta_t()
-        self._survivalTime = 0
-        self._ifDevelopedStroke = False
-        self._strokecount = 0
+        self._currentState = parameters.get_initial_health_state() # current health state
+        self._delta_t = parameters.get_delta_t() #simulation time step
+        self._survivalTime = 0 # survival time
+        self._ifDevelopedStroke = False #if the patient had developed a stroke
+        self._strokecount = 0 #number of strokes
 
-        # monitoring cost and utility outcomes
+        #monitoring cost and utility ourcomes
         self._costUtilityOutcomes = PatientCostUtilityMonitor(parameters)
 
     def update(self, k, next_state):
@@ -90,6 +88,7 @@ class PatientStateMonitor:
         :param k: current time step
         :param next_state: next state
         """
+
         # updates state of patient
         # if the patient has died, do nothing
         if not self.get_if_alive():
@@ -100,22 +99,13 @@ class PatientStateMonitor:
             self._survivalTime = (k+0.5) * self._delta_t  # k is number of steps its been, delta t is length of time
             # step, the 0.5 is a half cycle correction
 
-
         if self._currentState == P.HealthStats.STROKE:
             self._ifDevelopedStroke = True
             self._strokecount += 1
 
-        self._currentState = next_state
-
-        # update time until stroke
-        if self._currentState != P.HealthStats.STROKE and next_state == P.HealthStats.STROKE:
-            self._ifDevelopedAIDS = True
-            self._timeToAIDS = (k + 0.5) * self._delta_t  # corrected for the half-cycle effect
-
-        # collect cost and utility outcomes
+        #collect cost and utility outcomes
         self._costUtilityOutcomes.update(k, self._currentState, next_state)
 
-        # update current health state
         self._currentState = next_state
 
     def get_if_alive(self):
@@ -137,6 +127,14 @@ class PatientStateMonitor:
 
     def get_num_of_STROKE(self):
         return self._strokecount
+
+    def get_total_discounted_cost(self):
+        """ :returns total discounted cost """
+        return self._costUtilityOutcomes.get_total_discounted_cost()
+
+    def get_total_discounted_utility(self):
+        """ :returns total discounted utility"""
+        return self._costUtilityOutcomes.get_total_discounted_utility()
 
 class PatientCostUtilityMonitor:
 
@@ -164,8 +162,8 @@ class PatientCostUtilityMonitor:
                          self._param.get_annual_state_utility(next_state)) * self._param.get_delta_t()
 
         # add the cost of treatment
-        # if HIV death will occur
-        if next_state in [P.HealthStats.HIV_DEATH, P.HealthStats.BACKGROUND_DEATH]:
+        # if death will occur
+        if next_state in P.HealthStats.DEATH:
             cost += 0.5 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
         else:
             cost += 1 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
@@ -183,7 +181,6 @@ class PatientCostUtilityMonitor:
     def get_total_discounted_utility(self):
         """ :returns total discounted utility"""
         return  self._totalDiscountedUtility
-
 
 
 class Cohort:
@@ -227,10 +224,10 @@ class CohortOutputs:
         """
 
         self._survivalTimes = []        # patients' survival times
-        self._times_to_Stroke = []        # patients' times to stroke
-        self._count_strokes = []
+        self._times_to_Stroke = []      # patients' times to stroke
+        self._count_strokes = []        # patients' number of strokes
         self._costs = []                # patients' discounted total costs
-        self._utilities =[]             # patients' discounted total utilities
+        self._utilities = []            # patients' discounted total utilities
 
         # survival curve
         self._survivalCurve = \
@@ -248,40 +245,21 @@ class CohortOutputs:
             count_strokes = patient.get_number_of_strokes()
             self._count_strokes.append(count_strokes)
 
-            # get the patient's time to AIDS
-            time_to_stroke = patient.get_time_to_stroke()
-            if not (time_to_stroke is None):
-                self._times_to_stroke.append(time_to_stroke)
-
             # cost and utility
             self._costs.append(patient.get_total_discounted_cost())
             self._utilities.append(patient.get_total_discounted_utility())
 
-
-
         # summary statistics
         self._sumStat_survivalTime = StatCls.SummaryStat('Patient survival time', self._survivalTimes)
-        self._sumState_timeToStroke = StatCls.SummaryStat('Time until Stroke', self._times_to_stroke)
         self._sumState_number_strokes = StatCls.SummaryStat('Time until stroke', self._count_strokes)
         self._sumStat_cost = StatCls.SummaryStat('Patient discounted cost', self._costs)
         self._sumStat_utility = StatCls.SummaryStat('Patient discounted utility', self._utilities)
-
-
 
     def get_if_developed_stroke(self):
         return self._count_strokes
 
     def get_survival_times(self):
         return self._survivalTimes
-
-    def get_sumStat_survival_times(self):
-        return self._sumStat_survivalTime
-
-    def get_survival_curve(self):
-        return self._survivalCurve
-
-    def get_sumStat_count_strokes(self):
-        return self._sumState_number_strokes
 
     def get_costs(self):
         return self._costs
@@ -292,9 +270,6 @@ class CohortOutputs:
     def get_sumStat_survival_times(self):
         return self._sumStat_survivalTime
 
-    def get_sumStat_time_to_stroke(self):
-        return self._sumState_timeToStroke
-
     def get_sumStat_discounted_cost(self):
         return self._sumStat_cost
 
@@ -303,3 +278,6 @@ class CohortOutputs:
 
     def get_survival_curve(self):
         return self._survivalCurve
+
+    def get_sumStat_count_strokes(self):
+        return self._sumState_number_strokes
