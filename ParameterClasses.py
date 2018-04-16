@@ -56,7 +56,7 @@ class ParametersFixed():
             self._prob_matrix = calculate_prob_matrix_anticoag()
 
         # annual state costs and utilities
-        self._annualStateCosts = Data.ANTICOAGULANT_COST
+        self._annualStateCosts = Data.ANNUAL_STATE_COST
         self._annualStateUtilities = Data.ANNUAL_STATE_UTILITY
 
     def get_initial_health_state(self):

@@ -163,7 +163,7 @@ class PatientCostUtilityMonitor:
 
         # add the cost of treatment
         # if death will occur
-        if next_state in P.HealthStats.DEATH:
+        if next_state == P.HealthStats.DEATH:
             cost += 0.5 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
         else:
             cost += 1 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
