@@ -165,8 +165,20 @@ class PatientCostUtilityMonitor:
         # if death will occur
         if next_state == P.HealthStats.DEATH:
             cost += 0.5 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
+        elif current_state == P.HealthStats.STROKE:
+            cost += 0
+        elif current_state == P.HealthStats.WELL:
+            cost += 0
         else:
             cost += 1 * self._param.get_annual_treatment_cost() * self._param.get_delta_t()
+
+
+        #if next_state == P.HealthStats.DEATH:
+            #cost +=0.5*self._param.get_delta_t()
+
+        #else:
+            #cost +=1*self._param.get_annual_treatment_cost()*self._param.get_delta_t
+
 
         # update total discounted cost and utility (corrected for the half-cycle effect)
         self._totalDiscountedCost += \
